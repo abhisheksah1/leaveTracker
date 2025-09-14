@@ -161,3 +161,65 @@ export const getLeavesByEmployee = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Update a specific leave by leaveId
+export const updateLeave = async (req, res) => {
+  try {
+    const { leaveId } = req.params; // leave ID in URL
+    const updateData = req.body; // fields to update
+
+    if (!leaveId) {
+      return res.status(400).json({ message: 'leaveId parameter is required' });
+    }
+
+    const leave = await Leave.findById(leaveId);
+    if (!leave) {
+      return res.status(404).json({ message: 'Leave record not found' });
+    }
+
+    // Update fields (you can add validation if needed)
+    Object.keys(updateData).forEach((key) => {
+      leave[key] = updateData[key];
+    });
+
+    // Recalculate leaveDays if leaveMode or dates changed
+    if (leave.leaveMode === 'Single') {
+      leave.leaveDays = 1;
+    } else if (leave.leaveMode === 'Multiple') {
+      const fromDate = new Date(leave.leaveFrom);
+      const toDate = new Date(leave.leaveTo);
+      if (!isNaN(fromDate) && !isNaN(toDate)) {
+        leave.leaveDays = Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
+      }
+    }
+
+    await leave.save();
+
+    res.status(200).json({ message: 'Leave updated successfully', data: leave });
+  } catch (error) {
+    console.error('Error updating leave:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Delete a specific leave by leaveId
+export const deleteLeave = async (req, res) => {
+  try {
+    const { leaveId } = req.params;
+
+    if (!leaveId) {
+      return res.status(400).json({ message: 'leaveId parameter is required' });
+    }
+
+    const leave = await Leave.findByIdAndDelete(leaveId);
+
+    if (!leave) {
+      return res.status(404).json({ message: 'Leave record not found' });
+    }
+
+    res.status(200).json({ message: 'Leave deleted successfully', data: leave });
+  } catch (error) {
+    console.error('Error deleting leave:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

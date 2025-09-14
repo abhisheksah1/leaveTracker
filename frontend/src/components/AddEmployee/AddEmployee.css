@@ -1,131 +1,181 @@
 /* AddEmployee.css */
 .add-employee-container {
-  text-align: center;
   margin-top: 60px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Main Add Button */
 .add-employee-button {
-  padding: 12px 24px;
-  background-color: #007bff;
-  color: white;
-  font-size: 17px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.35);
 }
 
 .add-employee-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.03);
+  background: linear-gradient(135deg, #0056b3, #004099);
+  box-shadow: 0 8px 18px rgba(0, 86, 179, 0.45);
 }
 
-/* Popup Styles */
+/* Popup Overlay */
 .popup-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(4px);
-  background-color: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
+  animation: fadeIn 0.4s ease;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Popup Form */
 .popup-form {
-  background: #ffffff;
-  padding: 30px 35px;
-  border-radius: 12px;
-  width: 340px;
-  max-width: 90%;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  animation: fadeInScale 0.4s ease;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(15px);
+  padding: 35px 40px;
+  border-radius: 18px;
+  width: 380px;
+  max-width: 95%;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  animation: fadeInScale 0.35s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 @keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .popup-form h2 {
   margin-top: 0;
-  margin-bottom: 20px;
-  color: #333;
+  margin-bottom: 25px;
+  color: #222;
   font-size: 22px;
   font-weight: 600;
+  text-align: center;
 }
 
-/* Input Field */
+/* Input Fields */
 .popup-form label {
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   font-weight: 500;
   color: #444;
+  font-size: 14px;
 }
 
 .popup-form input {
   width: 100%;
-  padding: 10px 12px;
-  border: 2px solid #ddd;
-  border-radius: 6px;
+  padding: 12px 14px;
+  border: 1.8px solid #ddd;
+  border-radius: 10px;
   font-size: 15px;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition: all 0.25s ease;
   outline: none;
-  margin-top: 6px;
+  margin-bottom: 18px;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .popup-form input:focus {
   border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.35);
+  background: #fff;
 }
 
-/* Buttons in Form */
+/* File Input Styling */
+.popup-form input[type="file"] {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* Photo Preview */
+.photo-preview {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.photo-preview img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  transition: all 0.3s ease;
+}
+
+.photo-preview img:hover {
+  transform: scale(1.05);
+  border-color: #007bff;
+}
+
+/* Form Buttons */
 .form-buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 25px;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .form-buttons button {
-  padding: 10px 16px;
+  flex: 1;
+  padding: 12px;
   font-size: 15px;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  transition: all 0.25s ease;
+  font-weight: 500;
 }
 
 /* Submit Button */
 .form-buttons button[type="submit"] {
-  background-color: #28a745;
+  background: linear-gradient(135deg, #28a745, #1e7e34);
   color: white;
-  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.35);
 }
 
 .form-buttons button[type="submit"]:hover {
-  background-color: #218838;
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.03);
+  background: linear-gradient(135deg, #1e7e34, #155d27);
+  box-shadow: 0 6px 15px rgba(30, 126, 52, 0.45);
 }
 
 /* Cancel Button */
 .form-buttons button[type="button"] {
-  background-color: #dc3545;
+  background: linear-gradient(135deg, #dc3545, #a71d2a);
   color: white;
-  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.35);
 }
 
 .form-buttons button[type="button"]:hover {
-  background-color: #c82333;
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.03);
+  background: linear-gradient(135deg, #a71d2a, #7b1520);
+  box-shadow: 0 6px 15px rgba(167, 29, 42, 0.45);
+}
+
+/* Responsive */
+@media screen and (max-width: 450px) {
+  .popup-form {
+    width: 90%;
+    padding: 25px 20px;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+  }
 }

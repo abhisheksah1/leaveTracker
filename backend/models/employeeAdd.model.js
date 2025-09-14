@@ -14,10 +14,13 @@ const employeeSchema = new mongoose.Schema({
   employeeDepartment: {
     type: String,
     required: true,
+  },
+  photo: {
+    type: String, // store file path or URL
+    default: '',  // optional
   }
 }, { timestamps: true });
 
-// ✅ Prevent model overwrite on hot reload / repeated imports
 const Employee = mongoose.models.Employee || mongoose.model('Employee', employeeSchema);
 
 export default Employee;

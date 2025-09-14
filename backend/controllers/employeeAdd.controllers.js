@@ -29,16 +29,28 @@ export const getEmployee = async (req, res) => {
 
 // Create new employee
 export const createEmployee = async (req, res) => {
-  console.log('Incoming request body:', req.body); // 👈 Add this line
+  console.log('Body:', req.body);   // Text fields
+  console.log('File:', req.file);   // Uploaded file info
+
   try {
     const { employeeId, employeeName, employeeDepartment } = req.body;
-    const newEmployee = new Employee({ employeeId, employeeName, employeeDepartment });
+
+    if (!employeeId || !employeeName || !employeeDepartment) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const photo = req.file ? req.file.path : '';
+    const newEmployee = new Employee({ employeeId, employeeName, employeeDepartment, photo });
     await newEmployee.save();
-    res.status(201).json(newEmployee);
+
+    res.status(201).json({ message: 'Employee added successfully', newEmployee });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error(err);   // Detailed error
+    res.status(400).json({ message: err.message });
   }
 };
+
+
 
 
 

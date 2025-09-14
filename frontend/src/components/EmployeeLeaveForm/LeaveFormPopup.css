@@ -1,74 +1,118 @@
+/* Overlay */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
+  animation: fadeIn 0.3s ease;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal Box */
 .modal {
-  background: #fff;
-  padding: 25px;
-  border-radius: 10px;
-  width: 450px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  padding: 35px 40px;
+  border-radius: 16px;
+  width: 420px;
+  max-width: 95%;
   position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  animation: fadeInScale 0.35s ease;
 }
 
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 22px;
-  background: none;
-  border: none;
-  cursor: pointer;
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+
+/* Form */
+.leave-form {
+  display: flex;
+  flex-direction: column;
 }
 
 .leave-form label {
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   font-weight: 500;
+  font-size: 14px;
+  color: #333;
 }
 
 .leave-form input,
 .leave-form select {
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1.8px solid #ccc;
+  font-size: 15px;
+  transition: all 0.25s ease;
+  margin-top: 6px;
+  background: rgba(255, 255, 255, 0.85);
 }
 
+.leave-form input:focus,
+.leave-form select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.35);
+  outline: none;
+  background: #fff;
+}
+
+/* Submit Button */
 .leave-form button[type="submit"] {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
+  margin-top: 18px;
+  padding: 12px;
   font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
+  color: white;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.35);
+  transition: all 0.3s ease;
 }
 
 .leave-form button[type="submit"]:hover {
-  background-color: #0056b3;
+  transform: translateY(-2px) scale(1.03);
+  background: linear-gradient(135deg, #0056b3, #004099);
+  box-shadow: 0 8px 18px rgba(0, 86, 179, 0.45);
 }
 
+/* Open Modal Button */
 .open-button {
-  display: flex;
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 16px;
+  font-weight: 500;
   border: none;
-  border-radius: 6px;
-  background-color: #28a745;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #28a745, #1e7e34);
   color: white;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(40, 167, 69, 0.35);
 }
 
 .open-button:hover {
-  background-color: #218838;
+  transform: translateY(-2px) scale(1.03);
+  background: linear-gradient(135deg, #1e7e34, #155d27);
+  box-shadow: 0 8px 18px rgba(30, 126, 52, 0.45);
 }

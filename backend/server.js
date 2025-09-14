@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';                   // Import cors
+import path from 'path';
 import connectDB from './database/database.js';
 
 import employeeRoutes from './routes/employeeAdd.route.js';
@@ -20,6 +21,7 @@ app.use(cors({
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Connect to MongoDB Atlas
 connectDB();

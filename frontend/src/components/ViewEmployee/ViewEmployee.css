@@ -15,6 +15,7 @@ body {
 /* Employee List Section */
 .employee-list {
   display: grid;
+
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   padding: 20px;
@@ -295,3 +296,105 @@ body {
     font-size: 12px;
   }
 }
+
+.update-profile {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.update-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.update-button:hover {
+  background-color: #0056b3;
+}
+
+/* General Button Styles */
+.employee-info button,
+.history-button,
+.update-button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* View Profile Button */
+.employee-info button {
+  background: linear-gradient(90deg, #3498db, #2980b9);
+  color: #fff;
+}
+
+.employee-info button:hover {
+  background: linear-gradient(90deg, #2980b9, #1c5980);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* History Button */
+.history-button {
+  background: linear-gradient(90deg, #f39c12, #e67e22);
+  color: #fff;
+  margin-left: 10px;
+}
+
+.history-button:hover {
+  background: linear-gradient(90deg, #e67e22, #d35400);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Update Profile Button */
+.update-button {
+  background: linear-gradient(90deg, #2ecc71, #27ae60);
+  color: #fff;
+}
+
+.update-button:hover {
+  background: linear-gradient(90deg, #27ae60, #1e8449);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Inline Leave History inside Employee Card */
+.historyWidth {
+  width: 100%; /* Full width of parent employee card */
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-sizing: border-box;
+}
+
+.full-width-history {
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  overflow-x: auto; /* horizontal scroll if table is wide */
+}
+
+/* Optional: add smooth slide-down animation */
+.full-width-history {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

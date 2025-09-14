@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import './ViewEmployee.css';
+import EmployeeLeaveHistory from '../EmployeeLeaveHistory/EmployeeLeaveHistory';
 
-const defaultAvatar = 'https://cdn-icons-png.flaticon.com/512/847/847969.png'; // Placeholder avatar
+const defaultAvatar = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
 const ViewEmployee = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [detailError, setDetailError] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null); // Profile modal
+  const [historyEmployeeId, setHistoryEmployeeId] = useState(null); // Full-width history
 
+  // Fetch employee list
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/employees');
+        const res = await fetch('http://localhost:3000/api/employees'); // your backend port
         if (!res.ok) throw new Error('Failed to fetch employees');
         const data = await res.json();
         setEmployees(data);
@@ -24,30 +25,39 @@ const ViewEmployee = () => {
         setLoading(false);
       }
     };
-
     fetchEmployees();
   }, []);
 
+  // View Profile Logic
   const handleViewProfile = async (emp) => {
-    setDetailLoading(true);
-    setDetailError(null);
+    setSelectedEmployee(null); // reset modal while loading
+    setHistoryEmployeeId(null); // close history if open
+
     try {
       const res = await fetch(`http://localhost:3000/api/leaves/getLeave?employeeId=${emp.employeeId}`);
       if (!res.ok) throw new Error('Failed to fetch leave data');
       const data = await res.json();
-      const { summary } = data;
-      const completeData = { ...emp, ...summary };
-      setSelectedEmployee(completeData);
+      const { summary } = data; // expect API returns summary like {casualLeave, sickLeave, ...}
+      setSelectedEmployee({ ...emp, ...summary }); // merge summary with employee
     } catch (err) {
-      setDetailError(err.message);
-    } finally {
-      setDetailLoading(false);
+      console.error(err);
+      alert('Failed to load leave data');
     }
   };
 
+  // View History Logic
+  const handleViewHistory = (emp) => {
+    setHistoryEmployeeId(emp.employeeId); // show full-width table
+    setSelectedEmployee(null); // close profile modal
+  };
+
+  // Close profile modal or history on Escape
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') setSelectedEmployee(null);
+      if (event.key === 'Escape') {
+        setSelectedEmployee(null);
+        setHistoryEmployeeId(null);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -56,59 +66,71 @@ const ViewEmployee = () => {
   if (loading) return <div className="loader">Loading employees...</div>;
   if (error) return <p className="error-message">Error: {error}</p>;
 
-  const renderModal = () => {
-    if (detailLoading) return <p>Loading details...</p>;
-    if (detailError) return <p className="error-message">Error: {detailError}</p>;
+  // Calculate total leave taken
+  const calculateTotalLeaveTaken = (emp) => {
+    return (
+      (emp.casualLeave ?? 0) +
+      (emp.sickLeave ?? 0) +
+      (emp.personalLeave ?? 0) +
+      (emp.halfLeave ?? 0) +
+      (emp.overtime ?? 0) +
+      (emp.unpaidLeave ?? 0)
+    );
+  };
+
+  // Calculate total leaves including remaining balance
+  const calculateTotalLeaves = (emp) => {
+    return (emp.leaveBalance ?? 0) + calculateTotalLeaveTaken(emp);
+  };
+
+  const renderProfileModal = () => {
+    if (!selectedEmployee) return null;
+
+    const totalTaken = calculateTotalLeaveTaken(selectedEmployee);
 
     return (
-      <div className="modal-content">
-        <div className="modal-header">
-          <button className="close-button" onClick={() => setSelectedEmployee(null)}>❌</button>
-        </div>
-        <div className='profileWithName'>
-        <img src={defaultAvatar} alt="Profile" className="modal-avatar" />
-        <h2 className="employee-name">{selectedEmployee.employeeName}</h2>
-          <p><strong>ID:</strong> {selectedEmployee.employeeId}</p>
-        </div>
-        <div className="employee-details">
-          <p><strong>Department:</strong> {selectedEmployee.employeeDepartment}</p>
-         <p>
-  <strong>Leave Balance:</strong>{' '}
-  <span
-    style={{
-      color: (selectedEmployee.leaveBalance ?? 0) >= 0 ? 'green' : 'red',
-      fontWeight: 'bold'
-    }}
-  >
-    {(selectedEmployee.leaveBalance ?? 0).toFixed(1)} days remaining
-  </span>
-</p>
-        </div>
-        <h4 className="section-title">Leave Details</h4>
-        <div className="leave-details-grid">
-          <div className="leave-detail">
-            <p>Casual Leave</p>
-            <strong>{(selectedEmployee.casualLeave ?? 0).toFixed(1)} days</strong>
+      <div className="modal-overlay" onClick={() => setSelectedEmployee(null)}>
+        <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+          <div className='profileWithName'>
+            <img
+              src={selectedEmployee.photo ? `http://localhost:3000/uploads/${selectedEmployee.photo}` : defaultAvatar}
+              alt="Profile"
+              className="modal-avatar"
+            />
+            <h2 className="employee-name">{selectedEmployee.employeeName}</h2>
+            <p><strong>ID:</strong> {selectedEmployee.employeeId}</p>
           </div>
-          <div className="leave-detail">
-            <p>Sick Leave</p>
-            <strong>{(selectedEmployee.sickLeave ?? 0).toFixed(1)} days</strong>
+
+          <div className="employee-details">
+            <p><strong>Department:</strong> {selectedEmployee.employeeDepartment}</p>
+            <p>
+              <strong>Leave Balance:</strong>{' '}
+              <span style={{ color: (selectedEmployee.leaveBalance ?? 0) >= 0 ? 'green' : 'red', fontWeight: 'bold' }}>
+                {(selectedEmployee.leaveBalance ?? 0).toFixed(1)} days remaining
+              </span>
+            </p>
+            <p>
+              <strong>Total Leave Taken:</strong>{' '}
+              <span style={{ fontWeight: 'bold', color: '#2c3e50' }}>
+                {totalTaken.toFixed(1)} days
+              </span>
+            </p>
           </div>
-          <div className="leave-detail">
-            <p>Personal Leave</p>
-            <strong>{(selectedEmployee.personalLeave ?? 0).toFixed(1)} days</strong>
+
+          <h4 className="section-title">Leave Details</h4>
+          <div className="leave-details-grid">
+            <div className="leave-detail"><p>Casual Leave</p><strong>{(selectedEmployee.casualLeave ?? 0).toFixed(1)} days</strong></div>
+            <div className="leave-detail"><p>Sick Leave</p><strong>{(selectedEmployee.sickLeave ?? 0).toFixed(1)} days</strong></div>
+            <div className="leave-detail"><p>Personal Leave</p><strong>{(selectedEmployee.personalLeave ?? 0).toFixed(1)} days</strong></div>
+            <div className="leave-detail"><p>Half Leave</p><strong>{(selectedEmployee.halfLeave ?? 0).toFixed(1)} days</strong></div>
+            <div className="leave-detail"><p>Overtime</p><strong>{(selectedEmployee.overtime ?? 0).toFixed(1)} days</strong></div>
+            <div className="leave-detail"><p>Unpaid Leave</p><strong>{(selectedEmployee.unpaidLeave ?? 0).toFixed(1)} days</strong></div>
           </div>
-          <div className="leave-detail">
-            <p>Half Leave</p>
-            <strong>{(selectedEmployee.halfLeave ?? 0).toFixed(1)} days</strong>
-          </div>
-          <div className="leave-detail">
-            <p>Overtime</p>
-            <strong>{(selectedEmployee.overtime ?? 0).toFixed(1)} days</strong>
-          </div>
-          <div className="leave-detail">
-            <p>Unpaid Leave</p>
-            <strong>{(selectedEmployee.unpaidLeave ?? 0).toFixed(1)} days</strong>
+
+          <div className="update-profile">
+            <button className="update-button" onClick={() => alert(`Update profile for ${selectedEmployee.employeeName}`)}>
+              Update Profile
+            </button>
           </div>
         </div>
       </div>
@@ -116,31 +138,41 @@ const ViewEmployee = () => {
   };
 
   return (
-    <div className="employee-list">
-      {employees.length === 0 ? (
-        <p>No employees found.</p>
-      ) : (
-        employees.map((emp) => (
-          <div className="employee-card" key={emp._id}>
-            <img src={defaultAvatar} alt="User  " className="employee-avatar" />
+    <>
+      <div className="employee-list">
+        {employees.map((emp) => (
+          <div key={emp._id} className="employee-card">
+            <img
+              src={emp.photo ? `http://localhost:3000/uploads/${emp.photo}` : defaultAvatar}
+              alt="User"
+              className="employee-avatar"
+            />
             <div className="employee-info">
               <h3>{emp.employeeName}</h3>
               <p><strong>ID:</strong> {emp.employeeId}</p>
               <p><strong>Department:</strong> {emp.employeeDepartment}</p>
-              <button onClick={() => handleViewProfile(emp)}>View Profile</button>
+              <div className="action-buttons">
+                <button onClick={() => handleViewProfile(emp)}>View Profile</button>
+                <button className="history-button" onClick={() => handleViewHistory(emp)}>📜 History</button>
+              </div>
             </div>
           </div>
-        ))
-      )}
+        ))}
+      </div>
 
-      {selectedEmployee && (
-        <div className="modal-overlay" onClick={() => setSelectedEmployee(null)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            {renderModal()}
-          </div>
+      {/* Profile modal */}
+      {selectedEmployee && renderProfileModal()}
+
+      {/* Full-width EmployeeLeaveHistory */}
+      {historyEmployeeId && (
+        <div className="full-width-history">
+          <EmployeeLeaveHistory 
+            employeeId={historyEmployeeId} 
+            employeeName={employees.find(e => e.employeeId === historyEmployeeId)?.employeeName} 
+          />
         </div>
       )}
-    </div>
+    </>
   );
 };
 
