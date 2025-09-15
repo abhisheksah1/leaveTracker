@@ -39,7 +39,7 @@ export const createEmployee = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const photo = req.file ? req.file.path : '';
+    const photo = req.file ? req.file.filename : '';
     const newEmployee = new Employee({ employeeId, employeeName, employeeDepartment, photo });
     await newEmployee.save();
 

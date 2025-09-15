@@ -1,23 +1,14 @@
-import React from 'react';
-
-// import LeaveDashboard from './components/LeaveDashboard/LeaveDashboard';
-import Navbar from './components/Navbar/Navbar';
-import AddEmployee from './components/AddEmployee/AddEmployee';
-import ViewEmployee from './components/ViewEmployee/ViewEmployee';  
-import LeaveForm from './components/EmployeeLeaveForm/LeaveFrom';
-
-
+import React from "react";
+import Navbar from "./components/Navbar/Navbar";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <>
-      {/* <LeaveDashboard /> */}
-     <Navbar/>
-        <AddEmployee />
-        <LeaveForm />
-       <ViewEmployee />
-   
-      
+      <Navbar />
+      {/* Global ToastContainer */}
+      <ToastContainer position="top-right" autoClose={2000} hideProgressBar />
     </>
   );
 }

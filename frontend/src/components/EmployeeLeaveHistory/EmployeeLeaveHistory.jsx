@@ -9,14 +9,17 @@ const EmployeeLeaveHistory = ({ employeeId, employeeName }) => {
   const [error, setError] = useState(null);
 
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
-  const [updateLeave, setUpdateLeave] = useState(null); // For update modal
+  const [updateLeave, setUpdateLeave] = useState(null);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+  const totalPages = Math.ceil(leaveHistory.length / rowsPerPage);
 
   const fetchLeaveHistory = async () => {
     if (!employeeId) return;
-
     setLoading(true);
     setError(null);
-
     try {
       const res = await fetch(`http://localhost:3000/api/leaves/getLeave?employeeId=${employeeId}`);
       if (!res.ok) throw new Error('Failed to fetch leave history');
@@ -36,9 +39,7 @@ const EmployeeLeaveHistory = ({ employeeId, employeeName }) => {
 
   const handleDeleteLeave = async (leaveId) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/leaves/delete/${leaveId}`, {
-        method: 'DELETE',
-      });
+      const res = await fetch(`http://localhost:3000/api/leaves/delete/${leaveId}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete leave');
       toast.success('Leave deleted successfully');
       setDeleteConfirmId(null);
@@ -62,16 +63,13 @@ const EmployeeLeaveHistory = ({ employeeId, employeeName }) => {
 
   const handleUpdateLeaveSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const res = await fetch(`http://localhost:3000/api/leaves/update/${updateLeave._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateLeave),
       });
-
       if (!res.ok) throw new Error('Failed to update leave');
-
       toast.success('Leave updated successfully');
       setUpdateLeave(null);
       fetchLeaveHistory();
@@ -79,6 +77,19 @@ const EmployeeLeaveHistory = ({ employeeId, employeeName }) => {
       console.error(err);
       toast.error('Error updating leave');
     }
+  };
+
+  // Pagination slice
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = leaveHistory.slice(indexOfFirstRow, indexOfLastRow);
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   if (loading) return <p className="loader">Loading leave history...</p>;
@@ -102,9 +113,9 @@ const EmployeeLeaveHistory = ({ employeeId, employeeName }) => {
           </tr>
         </thead>
         <tbody>
-          {leaveHistory.map((leave, index) => (
+          {currentRows.map((leave, index) => (
             <tr key={leave._id || index}>
-              <td>{index + 1}</td>
+              <td>{indexOfFirstRow + index + 1}</td>
               <td>{leave._id || '-'}</td>
               <td>
                 {leave.leaveMode === 'Multiple'
@@ -115,23 +126,22 @@ const EmployeeLeaveHistory = ({ employeeId, employeeName }) => {
               <td>{leave.leaveTypeName || leave.leaveType}</td>
               <td>{leave.leaveMode}</td>
               <td>
-                <button
-                  className="update-leave-button"
-                  onClick={() => handleOpenUpdateModal(leave)}
-                >
-                  Update
-                </button>
-                <button
-                  className="delete-leave-button"
-                  onClick={() => setDeleteConfirmId(leave._id)}
-                >
-                  Delete
-                </button>
+                <button className="update-leave-button" onClick={() => handleOpenUpdateModal(leave)}>Update</button>
+                <button className="delete-leave-button" onClick={() => setDeleteConfirmId(leave._id)}>Delete</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+        </div>
+      )}
 
       {/* Delete Modal */}
       {deleteConfirmId && (
@@ -139,18 +149,8 @@ const EmployeeLeaveHistory = ({ employeeId, employeeName }) => {
           <div className="delete-modal">
             <p>Are you sure you want to delete this leave history?</p>
             <div className="modal-buttons">
-              <button
-                className="confirm-delete"
-                onClick={() => handleDeleteLeave(deleteConfirmId)}
-              >
-                Yes
-              </button>
-              <button
-                className="cancel-delete"
-                onClick={() => setDeleteConfirmId(null)}
-              >
-                No
-              </button>
+              <button className="confirm-delete" onClick={() => handleDeleteLeave(deleteConfirmId)}>Yes</button>
+              <button className="cancel-delete" onClick={() => setDeleteConfirmId(null)}>No</button>
             </div>
           </div>
         </div>
@@ -164,22 +164,21 @@ const EmployeeLeaveHistory = ({ employeeId, employeeName }) => {
             <form onSubmit={handleUpdateLeaveSubmit}>
               <div className="form-group">
                 <label>Leave Type:</label>
-  <select
-    value={updateLeave.leaveType}
-    onChange={(e) =>
-      setUpdateLeave({ ...updateLeave, leaveType: e.target.value })
-    }
-    required
-  >
-    <option value="">Select Leave Type</option>
-    <option value="Casual">Casual</option>
-    <option value="Sick">Sick</option>
-    <option value="Personal">Personal</option>
-    <option value="Half">Half</option>
-    <option value="Unpaid">Unpaid</option>
-    <option value="Overtime">Overtime</option>
-  </select>
+                <select
+                  value={updateLeave.leaveType}
+                  onChange={(e) => setUpdateLeave({ ...updateLeave, leaveType: e.target.value })}
+                  required
+                >
+                  <option value="">Select Leave Type</option>
+                  <option value="Casual">Casual</option>
+                  <option value="Sick">Sick</option>
+                  <option value="Personal">Personal</option>
+                  <option value="Half">Half</option>
+                  <option value="Unpaid">Unpaid</option>
+                  <option value="Overtime">Overtime</option>
+                </select>
               </div>
+
               <div className="form-group">
                 <label>Leave Mode:</label>
                 <select
@@ -228,13 +227,7 @@ const EmployeeLeaveHistory = ({ employeeId, employeeName }) => {
 
               <div className="modal-buttons">
                 <button type="submit" className="confirm-update">Update</button>
-                <button
-                  type="button"
-                  className="cancel-delete"
-                  onClick={() => setUpdateLeave(null)}
-                >
-                  Cancel
-                </button>
+                <button type="button" className="cancel-delete" onClick={() => setUpdateLeave(null)}>Cancel</button>
               </div>
             </form>
           </div>

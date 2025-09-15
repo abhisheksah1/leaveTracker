@@ -97,6 +97,27 @@
   box-shadow: 0 8px 18px rgba(0, 86, 179, 0.45);
 }
 
+.leave-form button[type="button"] {
+   margin-top: 18px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  background: linear-gradient(135deg, #dc3545, #a71d2a);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.35);
+  transition: all 0.3s ease;
+
+}
+.leave-form button[type="button"]:hover {
+ transform: translateY(-2px) scale(1.03);
+  background: linear-gradient(135deg, #a71d2a, #7b1520);
+  box-shadow: 0 6px 15px rgba(167, 29, 42, 0.45);
+}
+
 /* Open Modal Button */
 .open-button {
   padding: 12px 24px;

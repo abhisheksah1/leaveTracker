@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './AddEmployee.css';
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import "./AddEmployee.css";
 
 const AddEmployee = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
-    employeeId: '',
-    employeeName: '',
-    employeeDepartment: '',
+    employeeId: "",
+    employeeName: "",
+    employeeDepartment: "",
   });
-
   const [photo, setPhoto] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Handle text inputs
+  if (!isOpen) return null;
+
+  // Handle text input changes
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -35,40 +36,43 @@ const AddEmployee = ({ isOpen, onClose }) => {
   // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const data = new FormData();
-      data.append('employeeId', formData.employeeId);
-      data.append('employeeName', formData.employeeName);
-      data.append('employeeDepartment', formData.employeeDepartment);
-      if (photo) data.append('photo', photo);
+      data.append("employeeId", formData.employeeId);
+      data.append("employeeName", formData.employeeName);
+      data.append("employeeDepartment", formData.employeeDepartment);
+      if (photo) data.append("photo", photo);
 
-      const response = await fetch('http://localhost:3000/api/employees', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/api/employees", {
+        method: "POST",
         body: data,
       });
 
-      if (!response.ok) throw new Error('Failed to add employee');
+      if (!response.ok) throw new Error("Failed to add employee");
 
       const result = await response.json();
-      toast.success(result.message || 'Employee added successfully!');
+      toast.success(result.message || "Employee added successfully!");
 
       // Reset form
-      setFormData({ employeeId: '', employeeName: '', employeeDepartment: '' });
+      setFormData({ employeeId: "", employeeName: "", employeeDepartment: "" });
       setPhoto(null);
       setPreview(null);
-      onClose();
+
+      // Close popup after small delay to show toast
+      setTimeout(() => onClose(), 500);
     } catch (error) {
-      toast.error('Failed to add employee. Please try again.');
-      console.error('Error:', error);
+      toast.error("Failed to add employee. Please try again.");
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="popup-overlay">
-      <div className="popup-form">
+    <div className="popup-overlay" onClick={onClose}>
+      <div className="popup-form" onClick={(e) => e.stopPropagation()}>
         <h2>Add New Employee</h2>
         <form onSubmit={handleSubmit}>
           <label>
@@ -109,7 +113,6 @@ const AddEmployee = ({ isOpen, onClose }) => {
             <input type="file" accept="image/*" onChange={handlePhotoChange} />
           </label>
 
-          {/* Preview selected photo */}
           {preview && (
             <div className="photo-preview">
               <img src={preview} alt="Preview" />
@@ -117,13 +120,15 @@ const AddEmployee = ({ isOpen, onClose }) => {
           )}
 
           <div className="form-buttons">
-            <button type="submit">Submit</button>
-            <button type="button" onClick={onClose}>Cancel</button>
+            <button type="submit" disabled={loading}>
+              {loading ? "Adding..." : "Submit"}
+            </button>
+            <button type="button" onClick={onClose}>
+              Cancel
+            </button>
           </div>
         </form>
       </div>
-
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </div>
   );
 };

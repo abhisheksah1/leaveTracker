@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './LeaveFormPopup.css';
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import "./LeaveFormPopup.css";
 
 const LeaveForm = ({ isOpen, onClose }) => {
   const [form, setForm] = useState({
-    employeeId: '',
-    employeeName: '',
-    leaveType: 'Casual',
-    leaveMode: 'Single',
-    leaveDate: '',
-    leaveFrom: '',
-    leaveTo: '',
+    employeeId: "",
+    employeeName: "",
+    leaveType: "Casual",
+    leaveMode: "Single",
+    leaveDate: "",
+    leaveFrom: "",
+    leaveTo: "",
   });
 
   const handleChange = e => {
@@ -22,8 +21,8 @@ const LeaveForm = ({ isOpen, onClose }) => {
   const validate = () => {
     if (!form.employeeId.trim()) return "Employee ID is required";
     if (!form.employeeName.trim()) return "Employee Name is required";
-    if (form.leaveMode === 'Single' && !form.leaveDate) return "Select a leave date";
-    if (form.leaveMode === 'Multiple' && (!form.leaveFrom || !form.leaveTo)) return "Select both From and To dates";
+    if (form.leaveMode === "Single" && !form.leaveDate) return "Select a leave date";
+    if (form.leaveMode === "Multiple" && (!form.leaveFrom || !form.leaveTo)) return "Select both From and To dates";
     return null;
   };
 
@@ -41,52 +40,57 @@ const LeaveForm = ({ isOpen, onClose }) => {
         employeeName: form.employeeName,
         leaveType: form.leaveType,
         leaveMode: form.leaveMode,
-        leaveDate: form.leaveMode === 'Single' ? form.leaveDate : undefined,
-        leaveFrom: form.leaveMode === 'Multiple' ? form.leaveFrom : undefined,
-        leaveTo: form.leaveMode === 'Multiple' ? form.leaveTo : undefined,
+        leaveDate: form.leaveMode === "Single" ? form.leaveDate : undefined,
+        leaveFrom: form.leaveMode === "Multiple" ? form.leaveFrom : undefined,
+        leaveTo: form.leaveMode === "Multiple" ? form.leaveTo : undefined,
       };
 
-      const res = await fetch('http://localhost:3000/api/leaves/apply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("http://localhost:3000/api/leaves/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to apply leave');
+      if (!res.ok) throw new Error(data.message || "Failed to apply leave");
 
-      toast.success('Leave applied successfully!');
+      toast.success("Leave applied successfully!");
+
       setForm({
-        employeeId: '',
-        employeeName: '',
-        leaveType: 'Casual',
-        leaveMode: 'Single',
-        leaveDate: '',
-        leaveFrom: '',
-        leaveTo: '',
+        employeeId: "",
+        employeeName: "",
+        leaveType: "Casual",
+        leaveMode: "Single",
+        leaveDate: "",
+        leaveFrom: "",
+        leaveTo: "",
       });
-      onClose(); // close modal after success
+
+      // Close modal after small delay so toast is visible
+      setTimeout(() => onClose(), 500);
+
     } catch (err) {
       toast.error(err.message);
     }
   };
 
-  if (!isOpen) return null; // Don't render if not open
+  if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal">
-
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
         <h2>Apply for Leave</h2>
         <form onSubmit={handleSubmit} className="leave-form">
           <label>
             Employee ID
-            <input type="text" name="employeeId" value={form.employeeId} onChange={handleChange} required />
+            <input type="text" name="employeeId" value={form.employeeId} onChange={handleChange} />
           </label>
+
           <label>
             Employee Name
-            <input type="text" name="employeeName" value={form.employeeName} onChange={handleChange} required />
+            <input type="text" name="employeeName" value={form.employeeName} onChange={handleChange} />
           </label>
+
           <label>
             Leave Mode
             <select name="leaveMode" value={form.leaveMode} onChange={handleChange}>
@@ -94,7 +98,8 @@ const LeaveForm = ({ isOpen, onClose }) => {
               <option value="Multiple">Multiple Days</option>
             </select>
           </label>
-          {form.leaveMode === 'Single' ? (
+
+          {form.leaveMode === "Single" ? (
             <label>
               Leave Date
               <input type="date" name="leaveDate" value={form.leaveDate} onChange={handleChange} />
@@ -111,20 +116,21 @@ const LeaveForm = ({ isOpen, onClose }) => {
               </label>
             </>
           )}
+
           <label>
             Leave Type
             <select name="leaveType" value={form.leaveType} onChange={handleChange}>
-              {['Casual', 'Personal', 'Sick', 'Halfday', 'Overtime', 'Unpaid'].map(type => (
+              {["Casual", "Personal", "Sick", "Halfday", "Overtime", "Unpaid"].map(type => (
                 <option key={type} value={type}>{type}</option>
               ))}
             </select>
           </label>
+
           <div className="form-buttons">
             <button type="submit">Apply Leave</button>
             <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>
-        <ToastContainer position="top-right" autoClose={4000} />
       </div>
     </div>
   );
